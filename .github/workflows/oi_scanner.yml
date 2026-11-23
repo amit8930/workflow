@@ -1,0 +1,31 @@
+name: Bank Nifty Option Signal Bot
+
+on:
+  schedule:
+    # Runs every 5 mins between 9:15 AM and 9:45 AM IST (03:45 - 04:15 UTC) Mon-Fri
+    - cron: '45,50,55 3 * * 1-5'
+    - cron: '0,5,10,15 4 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  run-scanner:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Option Chain Scanner
+        env:
+          SHAREKHAN_API_KEY: ${{ secrets.SHAREKHAN_API_KEY }}
+          SHAREKHAN_ACCESS_TOKEN: ${{ secrets.SHAREKHAN_ACCESS_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python banknifty_oi_bot.py
